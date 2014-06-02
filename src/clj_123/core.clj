@@ -2,7 +2,8 @@
   (:require 
    [clojure.java.io :as io]
    [clojure.data.xml :refer [sexp-as-element emit indent-str parse]]
-   [clj-time core format])
+   [clj-time core format]
+   [clojure.pprint])
   (:import java.util.UUID
 	   javax.crypto.Mac
 	   javax.crypto.spec.SecretKeySpec
