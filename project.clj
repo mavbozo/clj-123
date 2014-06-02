@@ -7,7 +7,8 @@
                  [commons-codec "1.5"]
                  [clj-time "0.6.0"]
                  [org.clojure/data.xml "0.0.7"]]
-  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.4"]]
+   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.4"]
+                                  [clj-http "0.9.2"]]
                    :source-paths ["dev"]}}
-  :repl-options {:init-ns user})
+   :repl-options {:init-ns user})
 

@@ -4,7 +4,9 @@
 /resources/certs/*
 pom.xml
 pom.xml.asc
+config.edn
 *.jar
 *.class
+*-123-openssl-result
 /.lein-*
 /.nrepl-port

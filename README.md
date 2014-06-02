@@ -1,6 +1,7 @@
 # clj-123
 
-A Clojure library designed to handle 123 Payment.
+A Clojure library designed to handle 123 Payment on 123 XML Schema 1.1 only.
+
 
 ## Usage
 

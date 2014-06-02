@@ -1,0 +1,5 @@
+{:merchant-id "" 
+ :api-key     ""
+ :openssl     ""
+ :private-key ""
+ :public-key  ""}
