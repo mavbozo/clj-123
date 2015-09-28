@@ -5,7 +5,8 @@
    [clojure.test :refer :all]
    [clj-123.core :refer :all]))
 
-(def ott (clojure.edn/read-string (slurp "config.edn")))
+(defn ott []
+  (clojure.edn/read-string (slurp "config.edn")))
 
 (defn uuid [] 
   (str (-> (java.util.UUID/randomUUID)

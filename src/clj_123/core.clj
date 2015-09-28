@@ -3,7 +3,8 @@
    [clojure.java.io :as io]
    [clojure.data.xml :refer [sexp-as-element emit indent-str parse]]
    [clj-time core format]
-   [clojure.pprint])
+   [clojure.pprint]
+   [schema.core :as sch])
   (:import java.util.UUID
 	   javax.crypto.Mac
 	   javax.crypto.spec.SecretKeySpec
@@ -152,19 +153,19 @@
     (clojure.pprint/cl-format nil "~12,'0d" c)))
 
 
-(def ^:private ott-timestamp-formatter
+(def  ott-timestamp-formatter
   ;; custom 123 timestamp formatter for use with clj-time
   (clj-time.format/formatter "yyyy-MM-dd HH:mm:ss:SSS"))
 
 
-(defn ^:private joda-time->ott-timestamp-0 
+(defn  joda-time->ott-timestamp-0 
   "convert joda-time to 123 custom timestamp format
    t in UTC"
   [t]
   (clj-time.format/unparse ott-timestamp-formatter t))
 
 
-(defn ^:private str->ott-multiple-line-text-format [text]
+(defn  str->ott-multiple-line-text-format [text]
   ;; text has at most 5 lines and each line has at most 100 characters not including newline char
   ;; else this function will truncate that text
   (->> text
@@ -177,7 +178,7 @@
        (clojure.string/join "|")))
 
 
-(defn ^:private payment-items-schema [coll]
+(defn  payment-items-schema [coll]
   "payment-items schema for 123"
   (->> coll
        (map (fn [x] (-> x
@@ -188,34 +189,34 @@
                         (conj :PaymentItem)
                         vec)))))
 
-(def ^:private request-recipe {:Version identity
-                              :TimeStamp joda-time->ott-timestamp-0
-                              :MessageID identity
-                              :MerchantID identity
-                              :InvoiceNo int->ott-invoice-format
-                              :Amount number->ott-number
-                              :Discount number->ott-number
-                              :ServiceFee number->ott-number
-                              :ShippingFee number->ott-number
-                              :CurrencyCode identity
-                              :CountryCode identity
-                              :ProductDesc identity
-                              :PaymentItems payment-items-schema
-                              :PayerName identity
-                              :ShippingAddress identity
-                              :MerchantUrl identity
-                              :APICallUrl identity
-                              :AgentCode identity
-                              :ChannelCode identity
-                              :PayInSlipInfo str->ott-multiple-line-text-format
-                              :UserDefined1 identity
-                              :UserDefined2 identity
-                              :UserDefined3 identity
-                              :UserDefined4 identity
-                              :UserDefined5 identity
-                              :HashValue identity})
+(def  request-recipe {:Version identity
+                      :TimeStamp joda-time->ott-timestamp-0
+                      :MessageID identity
+                      :MerchantID identity
+                      :InvoiceNo int->ott-invoice-format
+                      :Amount number->ott-number
+                      :Discount number->ott-number
+                      :ServiceFee number->ott-number
+                      :ShippingFee number->ott-number
+                      :CurrencyCode identity
+                      :CountryCode identity
+                      :ProductDesc identity
+                      :PaymentItems payment-items-schema
+                      :PayerName identity
+                      :ShippingAddress identity
+                      :MerchantUrl identity
+                      :APICallUrl identity
+                      :AgentCode identity
+                      :ChannelCode identity
+                      :PayInSlipInfo str->ott-multiple-line-text-format
+                      :UserDefined1 identity
+                      :UserDefined2 identity
+                      :UserDefined3 identity
+                      :UserDefined4 identity
+                      :UserDefined5 identity
+                      :HashValue identity})
 
-(def ^:private inquiry-recipe {:Version identity
+(def  inquiry-recipe {:Version identity
                                :TimeStamp joda-time->ott-timestamp-0
                                :MessageID identity
                                :MerchantID identity
@@ -249,7 +250,7 @@
 (defn- number->ott-number-unformatter [x]
   x)
 
-(def ^:private inquiry-response-recipe
+(def  inquiry-response-recipe
   (apply array-map
          [:Version str
           :TimeStamp ott-timestamp-0->joda-time
@@ -302,3 +303,36 @@
                    (.init (SecretKeySpec. (.getBytes key) "HmacSHA1")))
                  (.getBytes msg)))
       (clojure.string/upper-case)))
+
+
+
+(def OttVersionSchema (sch/conditional string? (sch/pred #(>= (.length %) 3))))
+
+(def request-schema
+  {:Version OttVersionSchema
+   :TimeStamp java.util.Date
+   :MessageID sch/Str
+   :MerchantID sch/Str
+   :InvoiceNo sch/Int
+   :Amount java.lang.Double 
+   :Discount java.lang.Double 
+   :ServiceFee java.lang.Double 
+   :ShippingFee java.lang.Double 
+   :CurrencyCode sch/Str
+   :CountryCode sch/Str
+   :ProductDesc sch/Str
+   :PaymentItems [{:id "" :name "" :price "" :quantity ""}
+                  {:id "" :name "" :price "" :quantity ""}]
+   :PayerName ""
+   :ShippingAddress ""
+   :MerchantUrl ""
+   :APICallUrl ""
+   :AgentCode ""
+   :ChannelCode ""
+   :PayInSlipInfo ""
+   :UserDefined1 ""
+   :UserDefined2 ""
+   :UserDefined3 ""
+   :UserDefined4 ""
+   :UserDefined5 ""
+   :HashValue ""})
